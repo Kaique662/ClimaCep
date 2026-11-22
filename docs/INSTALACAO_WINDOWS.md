@@ -1,127 +1,75 @@
-# ClimaCEP — instalar e rodar no Windows (sem Docker)
+# ClimaCEP — instalar e rodar no Windows
 
-> **Tecnologias:** React Native / Expo SDK 58, Spring Boot 3.5 (Java 17+), PostgreSQL instalado no Windows. Nenhum container e necessario.
+> **Tecnologias:** React Native / Expo SDK 58, Spring Boot 3.5 (Java 17+) e PostgreSQL hospedado no Supabase. Nao e necessario instalar PostgreSQL, pgAdmin, Docker ou WSL no computador.
 
 ## A. Instalar programas
 
-1. Instale **PostgreSQL 16 ou 17** com **pgAdmin 4**, anote a senha do usuario `postgres` e mantenha a porta `5432` (ou informe outra na configuracao).
-2. Instale **JDK 17 ou 21** e verifique `java -version`.
-3. Instale **Apache Maven 3.9+** e verifique `mvn -version`. Se nao for reconhecido, configure `MAVEN_HOME` e a pasta `bin` no `Path` do Windows; feche e reabra o VS Code.
-4. Instale **Node.js 22.13+** e verifique `node -v` e `npm -v`.
-5. Tenha o **Expo Go** compativel com o SDK 58 no celular.
+1. Instale **JDK 17 ou 21** e verifique `java -version`.
+2. Instale **Apache Maven 3.9+** e verifique `mvn -version`. Se nao for reconhecido, configure `MAVEN_HOME` e a pasta `bin` no `Path` do Windows; feche e reabra o VS Code.
+3. Instale **Node.js 22.13+** e verifique `node -v` e `npm -v`.
+4. Tenha o **Expo Go** compativel com o SDK 58 no celular.
 
-**Atenção à porta 5432:** se houver algum servidor de banco antigo usando essa porta, encerre-o antes de iniciar o PostgreSQL instalado no Windows. Não exclua os dados antigos antes de fazer backup.
+## B. Configurar o backend e o banco Supabase
 
-## B. Criar o banco (apenas na primeira vez)
+1. No Explorer, copie `backend/.env.local.example` e renomeie a copia para `backend/.env.local`.
+2. Abra somente `backend/.env.local` no editor. Preencha os valores de conexao marcados como exemplo/placeholders para o projeto Supabase utilizado. Substitua `DB_PASSWORD` pela senha do banco e `APP_JWT_SECRET` por um segredo aleatorio com pelo menos 32 caracteres.
+3. Salve o arquivo. Nao coloque credenciais no terminal, em arquivos versionados ou no aplicativo mobile. `backend/.env.local` e ignorado pelo Git; nao o envie a colegas nem ao GitHub.
+4. Nao crie tabelas manualmente. O Spring Boot executa as migracoes Flyway e cria `users`, `favorites`, `search_history` e `flood_reports` no schema `public` na primeira inicializacao.
 
-1. Abra **pgAdmin 4**, conecte ao servidor PostgreSQL local usando a senha da instalacao.
-2. Clique com o botao direito em **Databases > Create > Database...**.
-3. Nome: `climacep`; Owner: `postgres` (padrao). Salve.
-4. Nao crie tabelas manualmente. As migracoes Flyway `V1` e `V2` criarao `users`, `favorites`, `search_history` e `flood_reports` ao iniciar o Spring Boot.
+## C. Iniciar e testar o backend
 
-Alternativa: conectado ao banco `postgres` no Query Tool, execute o SQL de `database/01-criar-banco.sql` **somente se o banco nao existir**.
-
-Caso ja exista um PostgreSQL local com o banco `climacep`, reutilize-o. Um banco que estava em um container antigo **nao aparece automaticamente** neste PostgreSQL instalado no Windows; para preservar dados antigos e necessario backup/restauracao.
-
-## C. Configurar senha e JWT (uma vez)
-
-Abra PowerShell na raiz do projeto:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\01-configurar-local.ps1
-```
-
-Informe a senha do PostgreSQL quando solicitada. O script cria `backend/.env.local` (nao incluido no Git), contendo a senha e um segredo JWT aleatorio.
-
-Se o usuario ou porta do PostgreSQL forem diferentes:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\01-configurar-local.ps1 -DbUser postgres -DbPort 5432
-```
-
-**Nunca envie `.env.local` a colegas ou ao GitHub**: ele contem a senha do banco em texto simples. O arquivo `.env.local.example` e apenas um modelo; o Spring Boot carrega as variaveis do arquivo local **por meio do script de inicializacao**.
-
-## D. Iniciar backend Spring Boot
-
-Abra um terminal PowerShell no VS Code (raiz do projeto):
+Na raiz do projeto, execute:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\02-iniciar-backend.ps1
 ```
 
-Na primeira vez o Maven baixa as dependencias. Mantenha o terminal aberto. O Spring Boot fica em `http://localhost:8080`.
+O script carrega as configuracoes de `backend/.env.local` e inicia o Spring Boot. Na primeira execucao, Maven pode baixar dependencias. Mantenha esse terminal aberto.
 
-Teste em outro terminal:
+Teste em outro terminal ou navegador no computador:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\04-testar-api.ps1
 ```
 
-Ou abra `http://localhost:8080/api/health` no navegador. O esperado e `{"status":"ok","application":"ClimaCEP API"}`.
+Ou abra `http://localhost:8080/api/health`. O resultado esperado e `{"status":"ok","application":"ClimaCEP API"}`.
 
-**Comandos equivalentes sem os scripts** (temporarios, no terminal PowerShell que vai rodar o servidor):
+## D. Conectar o Expo Go ao backend
 
-```powershell
-$env:DB_HOST="localhost"
-$env:DB_PORT="5432"
-$env:DB_NAME="climacep"
-$env:DB_USER="postgres"
-$env:DB_PASSWORD="SUA_SENHA_POSTGRES"
-$env:APP_JWT_SECRET="USE_UM_SEGREDO_ALEATORIO_COM_NO_MINIMO_32_CARACTERES"
-cd backend
-mvn spring-boot:run
-```
+O celular e o computador que executa o backend devem estar na mesma rede Wi-Fi.
 
-## E. Conectar o Expo Go ao backend
-
-O telefone precisa do **IPv4 do COMPUTADOR** na rede Wi-Fi, nao do celular e nao do gateway.
-
-1. No Windows, execute `ipconfig` e localize o endereco IPv4 do adaptador em uso.
-2. Copie `mobile/.env.example` para `mobile/.env` e edite:
-
-```env
-EXPO_PUBLIC_API_URL=http://192.168.15.117:8080
-```
-
-Troque o IP pelo IPv4 real da sua maquina. **No celular** abra `http://SEU_IP:8080/api/health` no navegador. So avance quando essa URL responder. Computador e celular devem estar na mesma rede, sem isolamento de clientes.
-
-3. No terminal PowerShell da raiz, execute:
+1. No Windows, execute `ipconfig` e localize o IPv4 do adaptador em uso.
+2. No Explorer, copie `mobile/.env.example` para `mobile/.env`. No arquivo, defina `EXPO_PUBLIC_API_URL` como `http://IP_DO_COMPUTADOR:8080`, usando o IPv4 encontrado.
+3. No navegador do celular, abra `http://IP_DO_COMPUTADOR:8080/api/health`. So avance quando a API responder.
+4. Na raiz do projeto, inicie o Expo:
 
 ```powershell
-Copy-Item .\mobile\.env.example .\mobile\.env
-# Edite mobile\.env antes de iniciar o Expo
 powershell -ExecutionPolicy Bypass -File .\scripts\03-iniciar-mobile.ps1
 ```
 
-Ou use os comandos manuais: `cd mobile`, `npm install` e `npx expo start -c`.
+Escaneie o QR Code com o Expo Go. Na primeira execucao o script instala as dependencias via `npm install`.
 
-Se o navegador do **computador** abre `http://SEU_IP:8080/api/health`, mas o do **celular** nao abre, confira firewall/rede. **Somente em rede domestica confiavel configurada como Privada**, PowerShell como administrador:
+Se o endereco abrir no computador, mas nao no celular, confira a rede Wi-Fi, VPN e firewall. Em uma rede domestica confiavel marcada como Privada, permita acesso de entrada para a porta TCP 8080 somente na rede local. Nao desligue o firewall inteiro.
 
-```powershell
-New-NetFirewallRule -DisplayName "ClimaCEP Java 8080" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8080 -Profile Private -RemoteAddress LocalSubnet
-```
-
-Nao desligue o firewall inteiro. Se o Windows pedir para permitir acesso de Java/OpenJDK a redes privadas, autorize apenas sua rede confiavel. Se outro dispositivo ainda nao alcancar o servidor, confira VPN, dados moveis, Wi-Fi de convidados e isolamento de clientes no roteador.
-
-## F. Testes depois de iniciar
+## E. Testes depois de iniciar
 
 - Crie um usuario pela aba Cadastro e faca login.
-- Consulte `04859240` e `04703003` na previsao, observando o CEP e as coordenadas meteorologicas.
-- Salve, edite e exclua um favorito (CRUD).
-- Verifique se as consultas aparecem no historico.
-- Envie um relato de enchente e confirme no segundo usuario.
+- Consulte `04859240` e `04703003` na previsao.
+- Salve, edite e exclua um favorito.
+- Confirme que as consultas aparecem no historico.
+- Envie um relato de enchente e confirme com uma segunda conta.
+- No Supabase, confira os registros no schema `public`.
 
-## G. Problemas comuns
+## F. Problemas comuns
 
 | Erro | Causa possivel | Solucao |
 |---|---|---|
 | `mvn` nao e reconhecido | Maven nao instalado/no Path | Instale Maven, configure Path e reinicie VS Code |
-| `Connection refused` no PostgreSQL | Servico parado ou porta errada | Abra `services.msc`, inicie o servico `postgresql-x64-*`, confira porta 5432 |
-| `database "climacep" does not exist` | Banco ainda nao criado | Crie o banco no pgAdmin |
-| `password authentication failed` | Credencial errada | Edite `backend/.env.local`, reinicie Spring Boot |
-| Erro Flyway V1/V2 | Banco/schemas inconsistentes | Leia log completo; nao apague dados automaticamente |
-| `Address already in use: bind` | Porta 8080 ocupada | Pare o outro programa que utiliza a porta ou altere PORT e o .env |
-| `fetch failed` no Expo Go | Celular nao alcanca backend | Teste primeiro `/api/health` no navegador do celular |
-| `401` na rota `/` ou endpoint privado | JWT necessario | Teste `/api/health` ou faça login |
+| `password authentication failed` | Senha do banco incorreta | Corrija `DB_PASSWORD` em `backend/.env.local` e reinicie o backend |
+| `Connection refused`, timeout ou erro DNS | URL, host, porta ou rede indisponivel | Confira os valores de conexao em `backend/.env.local` e o acesso a internet |
+| Erro Flyway V1/V2 | Schema inconsistente ou migracao interrompida | Leia o log completo; nao apague tabelas ou dados automaticamente |
+| `Address already in use: bind` | Porta 8080 ocupada | Pare o outro programa que utiliza a porta ou ajuste `PORT` em `backend/.env.local` |
+| `fetch failed` no Expo Go | Celular nao alcanca o backend | Teste primeiro `/api/health` no navegador do celular |
+| `401` em endpoint privado | Token JWT ausente ou expirado | Faca login novamente; `/api/health` e publico |
 
-**Nao apague o banco ou suas tabelas para consertar erro de rede.**
+**Nao apague tabelas ou dados do Supabase para corrigir erro de rede.**

@@ -9,7 +9,7 @@
 | API REST | /api/auth, /api/users, /api/favorites, /api/history | `backend/.../*Controller.java` |
 | Gerenciamento de estado | Context API (sessão) + hooks (telas, clima) | `mobile/src/app/AuthContext.js`, `WeatherDashboard.js` |
 | AsyncStorage | Último CEP por usuário | `mobile/App.js` |
-| Banco relacional | PostgreSQL (users, favorites, search_history) | PostgreSQL instalado no Windows, migração Flyway |
+| Banco relacional | PostgreSQL hospedado no Supabase (`users`, `favorites`, `search_history`, `flood_reports`) | Schema `public` no Supabase, migrações Flyway |
 | CRUD | Adicionar/listar/editar/excluir regiões favoritas | `FavoriteController.java`, `FavoritesScreen.js` |
 
 ## Testes manuais recomendados
@@ -19,7 +19,7 @@
 - [ ] Confirmar que rota GET `/api/favorites` sem Bearer retorna 401.
 - [ ] Buscar `04859240` e `04703003`; conferir CEP, coordenadas e todos os indicadores.
 - [ ] Adicionar favorito na tela Inicial; editar apelido em Favoritos e excluir.
-- [ ] Registrar e remover pesquisa no Histórico; verificar no PostgreSQL.
+- [ ] Registrar e remover pesquisa no Histórico; verificar no Supabase.
 - [ ] Atualizar nome e senha em Perfil.
 - [ ] Reiniciar o Expo Go e confirmar recuperação da sessão e último CEP.
 - [ ] Entrar com outra conta e confirmar isolamento dos favoritos e do histórico.

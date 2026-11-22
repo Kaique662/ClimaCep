@@ -6,7 +6,7 @@ if (-not (Test-Path $config)) {
 }
 if (-not (Get-Command java -ErrorAction SilentlyContinue)) { throw 'Java nao encontrado. Instale o JDK 17+ e configure o PATH.' }
 if (-not (Get-Command mvn -ErrorAction SilentlyContinue)) { throw 'Maven nao encontrado. Instale o Maven 3.9+ e configure o PATH.' }
-$keys = @('DB_HOST','DB_PORT','DB_NAME','DB_USER','DB_PASSWORD','APP_JWT_SECRET','PORT')
+$keys = @('DB_HOST','DB_PORT','DB_NAME','DB_USER','DB_PASSWORD','DB_URL','DB_POOL_SIZE','DB_POOL_MIN_IDLE','DB_CONNECTION_TIMEOUT','APP_JWT_SECRET','PORT')
 foreach ($line in [System.IO.File]::ReadAllLines($config)) {
     $trimmed = $line.Trim()
     if (-not $trimmed -or $trimmed.StartsWith('#')) { continue }
@@ -19,7 +19,7 @@ foreach ($line in [System.IO.File]::ReadAllLines($config)) {
 if (-not $env:DB_PASSWORD -or $env:DB_PASSWORD -eq 'COLOQUE_A_SENHA_DO_POSTGRES') { throw 'Configure DB_PASSWORD em backend\.env.local.' }
 if (-not $env:APP_JWT_SECRET -or $env:APP_JWT_SECRET.Length -lt 32) { throw 'Configure APP_JWT_SECRET com 32 caracteres ou mais.' }
 Write-Host 'Iniciando Spring Boot diretamente no Windows (porta 8080)...' -ForegroundColor Cyan
-Write-Host 'O banco PostgreSQL deve estar iniciado no Windows. Pare com Ctrl+C.'
+Write-Host 'O banco PostgreSQL deve estar acessivel. Pare com Ctrl+C.'
 Push-Location (Join-Path $root 'backend')
 try {
     & mvn spring-boot:run

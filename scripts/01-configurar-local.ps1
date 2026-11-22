@@ -2,7 +2,8 @@ param(
     [string]$DbHost = 'localhost',
     [int]$DbPort = 5432,
     [string]$DbName = 'climacep',
-    [string]$DbUser = 'postgres'
+    [string]$DbUser = 'postgres',
+    [string]$DbUrl = ''
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
@@ -32,8 +33,16 @@ $content = @(
   "DB_PASSWORD=$password"
   "APP_JWT_SECRET=$jwtSecret"
   'PORT=8080'
-) -join "`r`n"
+)
+if (-not [string]::IsNullOrWhiteSpace($DbUrl)) {
+  $content += "DB_URL=$DbUrl"
+}
+$content = $content -join "`r`n"
 [System.IO.File]::WriteAllText($dest, $content + "`r`n", ([System.Text.UTF8Encoding]::new($false)))
 Write-Host 'Configuracao criada com sucesso: backend\.env.local' -ForegroundColor Green
 Write-Host 'ATENCAO: contem a senha em texto simples, apenas na maquina local. Nao envie ao GitHub.' -ForegroundColor Yellow
-Write-Host 'O banco climacep deve existir no PostgreSQL (crie no pgAdmin antes de iniciar).'
+if (-not [string]::IsNullOrWhiteSpace($DbUrl)) {
+  Write-Host 'O Flyway criara as tabelas em public no banco PostgreSQL do Supabase.'
+} else {
+  Write-Host 'O banco climacep deve existir no PostgreSQL local (crie no pgAdmin antes de iniciar).'
+}
