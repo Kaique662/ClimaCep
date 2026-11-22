@@ -1,0 +1,15 @@
+**/node_modules/
+**/.expo/
+**/dist/
+**/target/
+**/.idea/
+**/.vscode/
+**/.env
+**/.env.local
+*.log
+.DS_Store
+
+# Configuracao local de banco e JWT (segredos)
+backend/.env.local
+**/.env.local
+*.bak
