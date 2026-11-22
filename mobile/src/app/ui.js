@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 export const colors = {
@@ -37,6 +37,17 @@ export function ScreenTitle({ eyebrow, title, description }) {
     <Text style={ui.title}>{title}</Text>
     {description ? <Text style={ui.description}>{description}</Text> : null}
   </View>;
+}
+export function KeyboardAwareScrollView({ children, ...props }) {
+  return <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+    <ScrollView
+      automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+      keyboardShouldPersistTaps="handled"
+      {...props}
+    >
+      {children}
+    </ScrollView>
+  </KeyboardAvoidingView>;
 }
 export const ui = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.bg },
