@@ -33,5 +33,5 @@ export async function getAddressByCep(rawCep) {
       };
     }
   } catch (e) { console.info('AwesomeAPI CEP:', e.message); }
-  throw new Error('Não foi possível confirmar o endereço deste CEP. Verifique o número e sua internet.');
+  throw new Error('Não foi possível confirmar se este CEP existe. Verifique o número ou tente novamente quando houver conexão.');
 }
