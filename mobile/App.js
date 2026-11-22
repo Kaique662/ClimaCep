@@ -3,7 +3,7 @@ import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -51,12 +51,21 @@ function WeatherScreen({ route, navigation }) {
     onFloodReport={(result) => navigation.navigate('Enchentes', { cep: result.cep, requestNonce: Date.now() })}/>;
 }
 function MainTabs() {
+  const insets = useSafeAreaInsets();
   const icons = { 'Início': 'cloud-outline', 'Enchentes': 'warning-outline', 'Favoritos': 'bookmark-outline', 'Histórico': 'time-outline', 'Perfil': 'person-circle-outline' };
   const selected = { 'Início': 'cloud', 'Enchentes': 'warning', 'Favoritos': 'bookmark', 'Histórico': 'time', 'Perfil': 'person-circle' };
   return <Tabs.Navigator screenOptions={({ route }) => ({
     headerShown: false,
-    tabBarActiveTintColor: colors.blue, tabBarInactiveTintColor: '#7C8CA4',
-    tabBarStyle: { backgroundColor: '#FFFFFF', borderTopColor: colors.border, height: 66, paddingTop: 6, paddingBottom: 7 },
+    tabBarHideOnKeyboard: true,
+    tabBarActiveTintColor: colors.blue, 
+    tabBarInactiveTintColor: '#7C8CA4',
+    tabBarStyle: {
+      backgroundColor: '#FFFFFF',
+      borderTopColor: colors.border,
+      height: 66 + insets.bottom,
+      paddingTop: 6,
+      paddingBottom: 7 + insets.bottom,
+    },
     tabBarLabelStyle: { fontSize: 11, fontWeight: '700' },
     tabBarIcon: ({ focused, color, size }) => <Ionicons name={focused ? selected[route.name] : icons[route.name]} color={color} size={size}/>,
   })}>

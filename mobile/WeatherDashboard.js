@@ -18,6 +18,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import WeatherIcon from './src/components/WeatherIcon';
+import { KeyboardAwareScrollView } from './src/app/ui';
 import { getWeatherByCep } from './src/services/weatherApi';
 import { C, cardShadow } from './src/styles/theme';
 import { dateLabel, dayLabel, decimal, formatCep, hourLabel, onlyDigits, rounded, timeLabel } from './src/utils/format';
@@ -393,10 +394,9 @@ function MainScreen({ requestedCep, requestNonce, onWeatherLoaded, onSaveFavorit
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <StatusBar style="dark" />
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={C.blue} colors={[C.blue]} />}
       >
@@ -470,7 +470,7 @@ function MainScreen({ requestedCep, requestNonce, onWeatherLoaded, onSaveFavorit
           </View>
         ) : null}
         <Attribution />
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }
