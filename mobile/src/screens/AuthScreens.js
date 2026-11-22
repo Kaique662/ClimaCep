@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useAuth } from '../app/AuthContext';
 import { API_BASE_URL } from '../app/api';
-import { colors, Field, Message, PrimaryButton, ui } from '../app/ui';
+import { colors, Field, KeyboardAwareScrollView, Message, PrimaryButton, ui } from '../app/ui';
 
 function AuthLayout({ children, subtitle }) {
   return <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={s.container}>
+    <KeyboardAwareScrollView contentContainerStyle={s.container}>
         <LinearGradient colors={['#257DED','#0B4EB6']} style={s.brandIcon}>
           <MaterialCommunityIcons name="weather-partly-cloudy" color="white" size={44}/>
         </LinearGradient>
@@ -19,8 +18,7 @@ function AuthLayout({ children, subtitle }) {
         <Text style={s.title}>{subtitle}</Text>
         <View style={s.formCard}>{children}</View>
         <Text style={s.apiHint}>Backend: {API_BASE_URL || 'Configure mobile/.env'}</Text>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   </SafeAreaView>;
 }
 export function LoginScreen({ navigation }) {

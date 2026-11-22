@@ -1,11 +1,12 @@
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../app/AuthContext';
 import { apiRequest } from '../app/api';
-import { colors, Field, Message, PrimaryButton, ScreenTitle, ui } from '../app/ui';
+import { getAddressByCep } from '../services/cepAddress';
+import { colors, Field, KeyboardAwareScrollView, Message, PrimaryButton, ScreenTitle, ui } from '../app/ui';
 import { onlyDigits, formatCep } from '../utils/format';
 
 export default function FavoritesScreen({ navigation }) {
@@ -29,7 +30,12 @@ export default function FavoritesScreen({ navigation }) {
     if (!nickname.trim()) { setError('Dê um nome para identificar esta região.'); return; }
     setSaving(true); setError(''); setMessage('');
     try {
-      await apiRequest('/api/favorites', { method: 'POST', token, data: { cep: digits, nickname: nickname.trim() } });
+      const address = await getAddressByCep(digits);
+      await apiRequest('/api/favorites', { method: 'POST', token, data: {
+        cep: digits, nickname: nickname.trim(),
+        neighborhood: address.neighborhood || null,
+        city: address.city, state: address.state,
+      } });
       setCep(''); setNickname(''); setMessage('Região adicionada aos favoritos.'); await refresh();
     } catch (e) { setError(e.message); } finally { setSaving(false); }
   };
@@ -54,7 +60,7 @@ export default function FavoritesScreen({ navigation }) {
   const openRegion = (item) => navigation.navigate('Início', { cep: item.cep, requestNonce: Date.now() });
 
   return <SafeAreaView style={ui.page} edges={['top', 'left', 'right']}>
-    <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={ui.container}>
+    <KeyboardAwareScrollView contentContainerStyle={ui.container}>
       <ScreenTitle eyebrow="MINHAS LOCALIZAÇÕES" title="Regiões favoritas" description="Salve CEPs importantes e volte à previsão com um toque." />
       <View style={ui.card}>
         <Text style={[ui.itemTitle, { marginBottom: 13 }]}>Adicionar uma região</Text>
@@ -97,6 +103,6 @@ export default function FavoritesScreen({ navigation }) {
           </TouchableOpacity>
         </View>}
       </View>)}
-    </ScrollView>
+    </KeyboardAwareScrollView>
   </SafeAreaView>;
 }

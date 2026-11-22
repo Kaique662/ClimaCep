@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, Text, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../app/AuthContext';
 import { apiRequest } from '../app/api';
-import { colors, Field, Message, PrimaryButton, ScreenTitle, ui } from '../app/ui';
+import { colors, Field, KeyboardAwareScrollView, Message, PrimaryButton, ScreenTitle, ui } from '../app/ui';
 
 export default function ProfileScreen() {
   const { user, token, logout, updateName } = useAuth();
@@ -26,7 +26,7 @@ export default function ProfileScreen() {
     } catch (e) { setError(e.message); } finally { setBusy(false); }
   };
   return <SafeAreaView style={ui.page} edges={['top', 'left', 'right']}>
-    <ScrollView contentContainerStyle={ui.container} keyboardShouldPersistTaps="handled">
+    <KeyboardAwareScrollView contentContainerStyle={ui.container}>
       <ScreenTitle eyebrow="MINHA CONTA" title="Meu perfil" description="Atualize seus dados e gerencie a segurança da sua conta."/>
       <View style={[ui.card, ui.row, { gap: 14 }] }>
         <View style={{ backgroundColor: colors.light, borderRadius: 18, padding: 15 }}><Ionicons name="person" color={colors.blue} size={29}/></View>
@@ -52,6 +52,6 @@ export default function ProfileScreen() {
           { text: 'Sair', style: 'destructive', onPress: () => logout().catch((e) => setError(e.message)) },
         ])}/>
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   </SafeAreaView>;
 }

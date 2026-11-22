@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import {
-  ActivityIndicator, Alert, Keyboard, ScrollView, StyleSheet, Text,
+  ActivityIndicator, Alert, Keyboard, StyleSheet, Text,
   TextInput, TouchableOpacity, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth } from '../app/AuthContext';
 import { apiRequest } from '../app/api';
-import { colors, Message, PrimaryButton, ScreenTitle, ui } from '../app/ui';
+import { colors, KeyboardAwareScrollView, Message, PrimaryButton, ScreenTitle, ui } from '../app/ui';
 import { getAddressByCep } from '../services/cepAddress';
 import { onlyDigits, formatCep } from '../utils/format';
 
@@ -140,7 +140,7 @@ export default function FloodScreen({ route }) {
   const presentation = situations[summary?.situation] || situations.NO_REPORTS;
 
   return <SafeAreaView style={ui.page} edges={['top', 'left', 'right']}>
-    <ScrollView contentContainerStyle={ui.container} keyboardShouldPersistTaps="handled">
+    <KeyboardAwareScrollView contentContainerStyle={ui.container}>
       <ScreenTitle eyebrow="COMUNIDADE CLIMACEP" title="Alertas de enchente" description="Veja relatos recentes por CEP e informe se você observou alagamento na região."/>
 
       <View style={styles.notice}>
@@ -232,7 +232,7 @@ export default function FloodScreen({ route }) {
         <Text style={[ui.itemTitle, { marginTop: 10 }]}>A comunidade ajuda a informar</Text>
         <Text style={ui.itemSub}>Digite um CEP para consultar relatos de alagamento e registrar sua observação.</Text>
       </View> : null}
-    </ScrollView>
+    </KeyboardAwareScrollView>
   </SafeAreaView>;
 }
 
