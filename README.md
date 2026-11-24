@@ -31,7 +31,7 @@ COMPUTADOR — Spring Boot via Maven (Windows / Java)
    ```
 
 4. Confira a API: `http://localhost:8080/api/health`. Resultado esperado: `{"status":"ok","application":"ClimaCEP API"}`. Na primeira inicializacao, Flyway cria as tabelas no schema `public` do Supabase.
-5. Copie `mobile/.env.example` para `mobile/.env` e configure o IPv4 do computador em `EXPO_PUBLIC_API_URL`, por exemplo `http://192.168.15.117:8080`. Nao use o IP do celular ou o gateway.
+5. Copie `mobile/.env.example` para `mobile/.env` e configure o IPv4 do computador em `EXPO_PUBLIC_API_URL`, por exemplo `http://192.168.16.1:8080`. Nao use o IP do celular ou o gateway.
 6. Teste `http://IPv4_DO_PC:8080/api/health` no navegador do celular. Se nao abrir, confira firewall e rede antes de tentar cadastro.
 7. **Terminal 2 — Mobile**, na raiz do projeto:
 
